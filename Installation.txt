@@ -1,0 +1,84 @@
+
+step 1 - install MongoDB (from website)
+         - install mongodb compass
+         - install tools (mongosh) mongoshell
+         - add environment variables path
+
+step 2 - install Postman API
+
+step 3 - connect mongodb compass to localhost:27017
+         In monogosh
+         - show dbs
+         - use student
+         - db.CreateColloection('profile')
+         - db.profile.insertOne({name:"abc", branch:"iT"})
+         
+
+step 4 - create folder curd
+
+step 5 - Initalize
+         - npm i mongodb
+         - npm i express
+
+step 6 - create index.js and mongodb.js
+
+step 7 - add code to mongodb.js
+
+const {MongoClient} = require('mongodb');
+const url = "mongodb://localhost:27017"
+const database = 'student';
+const client = new MongoClient(url);
+
+const dbConnect=async()=>{
+    const result = await client.connect();
+    const db = await result.db(database);
+    return db.collection('profile')
+
+}
+
+module.exports=dbConnect;
+
+
+step 8 - add code to index.js
+const dbConnect = require('./mongodb')
+const express = require('express');
+const app = express();
+app.use(express.json())
+
+//get API
+
+app.get('/getData',async(req,res)=>{
+    let result = await dbConnect();
+    result = await result.find().toArray();
+    res.send(result);
+})
+
+//post API
+
+app.post('/insertData',async(req,res)=>{
+    let result = await dbConnect();
+    result = result.insertOne(req.body);
+    res.send("Data Inserted Successfully")
+})
+
+//put API
+
+app.put('/updateData/:name',async(req,res)=>{
+    let result = await dbConnect();
+    result = await result.updateOne({name:req.params.name},{$set:req.body});
+    res.send("Data Updated Successfully")
+})
+
+//Delete API
+
+app.delete('/deleteData/:name',async(req,res)=>{
+    let result = await dbConnect();
+    result = await result.deleteOne({name:req.params.name})
+    res.send("Data Deleted Successfully"); 
+})
+
+
+app.listen(3000);
+
+
+step 9 - Go to Postman API and run all commands
